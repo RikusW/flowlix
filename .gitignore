@@ -2,3 +2,6 @@
 /prebuilt/
 /dist/
 /work/
+
+# Cloned by scripts/build-in-place.sh
+/external/JUCE/

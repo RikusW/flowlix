@@ -1,8 +1,10 @@
 # Patches
 
 These are applied (in numeric order) to the pinned `external/FlowtoysUpdater`
-submodule during the container build — see the `Dockerfile`. They are plain
-`git diff` output and apply with either `git apply` or `patch -p1`.
+submodule by either the container build (`Dockerfile`) or the native build
+(`scripts/build-in-place.sh`). They are plain `git diff` output and apply with
+either `git apply` or `patch -p1`; the native script skips patches that are
+already applied.
 
 | Patch | File(s) | Why |
 |-------|---------|-----|
