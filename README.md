@@ -52,10 +52,11 @@ exists, but you install it through your package manager (not an in-app download)
 | Path | What |
 |------|------|
 | `external/FlowtoysUpdater` | Upstream source, git submodule pinned to a known commit. |
+| `external/JUCE`            | JUCE 5.4.7, shallow (`depth=1`) git submodule. |
 | `patches/`                 | Linux fixes applied to the submodule at build time (see `patches/README.md`). |
 | `Dockerfile`               | Hermetic build (only host dep: podman/docker); outputs the binary. |
 | `scripts/build-in-docker.sh` | Runs the container build → `prebuilt/linux_amd64/FlowtoysUpdater`. |
-| `scripts/build-in-place.sh` | Native in-place build (clones JUCE to `external/JUCE`) → same output. |
+| `scripts/build-in-place.sh` | Native in-place build → same output. |
 | `.goreleaser.yaml`         | GoReleaser Pro config: prebuilt binary → tar.gz + deb + rpm + Arch + AUR. |
 | `.github/workflows/`       | `build.yml` (PR sanity build) and `release.yml` (tagged release). |
 | `packaging/`               | udev rule + `.desktop` entry shipped in the packages. |
@@ -74,9 +75,10 @@ Only Docker/Podman is required — no host toolchain or JUCE install:
 ```
 
 Or build natively, in place. This needs `git`, a C++ toolchain and the
-X11/freetype/libcurl/libusb dev packages; JUCE is cloned into `external/JUCE`
-automatically and the patches are applied to the `external/FlowtoysUpdater`
-working tree (patches already applied are skipped, so it can be re-run):
+X11/freetype/libcurl/libusb dev packages. JUCE is a shallow submodule at
+`external/JUCE` and the script initialises it; the patches are applied to the
+`external/FlowtoysUpdater` working tree (patches already applied are skipped,
+so it can be re-run):
 
 ```bash
 ./scripts/build-in-place.sh         # -> prebuilt/linux_amd64/FlowtoysUpdater

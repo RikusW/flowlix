@@ -2,11 +2,11 @@
 #
 # Build the FlowtoysUpdater binary natively, in place, without a container.
 #
-# JUCE is cloned beside the app (the Makefile references ../../../JUCE/modules,
-# which resolves to external/JUCE). The patches in patches/ are applied to the
-# external/FlowtoysUpdater submodule working tree; patches that are already
-# applied are skipped, so the script is safe to re-run. The Release build is
-# staged as a stripped binary in prebuilt/linux_amd64/.
+# JUCE is a shallow submodule at external/JUCE (the Makefile references
+# ../../../JUCE/modules, which resolves there). The patches in patches/ are
+# applied to the external/FlowtoysUpdater submodule working tree; patches that
+# are already applied are skipped, so the script is safe to re-run. The Release
+# build is staged as a stripped binary in prebuilt/linux_amd64/.
 #
 set -euo pipefail
 
@@ -15,7 +15,6 @@ cd "$(dirname "$0")/.."
 ROOT="$PWD"
 APP="external/FlowtoysUpdater"
 JUCE="external/JUCE"
-JUCE_TAG="${JUCE_TAG:-5.4.7}"
 BUILD_DIR="$APP/Builds/LinuxMakefile"
 OUT_DIR="prebuilt/linux_amd64"
 
@@ -48,21 +47,9 @@ fi
 
 # --- JUCE --------------------------------------------------------------------
 
-if [ -d "$JUCE/modules/juce_core" ]; then
-  have="$(git -C "$JUCE" describe --tags --exact-match 2>/dev/null || true)"
-  if [ -n "$have" ] && [ "$have" != "$JUCE_TAG" ]; then
-    echo "!! $JUCE is at '$have', expected '$JUCE_TAG' (remove it to re-clone)" >&2
-    exit 1
-  fi
-  echo ">> Using existing JUCE in $JUCE${have:+ ($have)}"
-elif [ -e "$JUCE" ]; then
-  echo "!! $JUCE exists but has no modules/juce_core; remove it and retry" >&2
-  exit 1
-else
-  echo ">> Cloning JUCE $JUCE_TAG into $JUCE"
-  git clone --depth 1 --branch "$JUCE_TAG" \
-    https://github.com/juce-framework/JUCE.git "$JUCE"
-fi
+# A shallow (depth-1) submodule pinned to the tag the Makefile was generated for.
+echo ">> Initialising JUCE submodule"
+git submodule update --init --depth 1 -- "$JUCE"
 
 # --- Patches -----------------------------------------------------------------
 
